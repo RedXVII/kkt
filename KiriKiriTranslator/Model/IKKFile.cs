@@ -17,6 +17,8 @@ namespace KiriKiriTranslator.Model
 
         bool Save(string filePath);
 
+        bool ExportToXLS(string filePath);
+
         List<KKLabelGroup> KKLabelGroups { get; }
         List<KKLabelGroup> KKLabelGroupsToTranslate { get; }
     }

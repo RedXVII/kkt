@@ -31,6 +31,11 @@ namespace KiriKiriTranslator.Design
             return true;
         }
 
+        public bool ExportToXLS(string filePath)
+        {
+            return true;
+        }
+
         public List<KKLabelGroup> KKLabelGroups
         {
             get

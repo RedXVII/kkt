@@ -7,7 +7,8 @@
         xmlns:local="clr-namespace:KiriKiriTranslator"
         mc:Ignorable="d ignore"
         Height="800"
-        Width="950"
+        Width="1100"
+        Icon="yukikaze.ico"
         Title="KiriKiriTranslator - Yukikaze a cute"
         DataContext="{Binding Main, Source={StaticResource Locator}}">
 
@@ -31,6 +32,7 @@
         <StackPanel Orientation="Horizontal" Grid.Row="0">
             <Button Margin="5,0" Command="{Binding SaveCommand}">Save</Button>
             <Button Margin="5,0" Command="{Binding GenerateKKCommand}">Generate KK</Button>
+            <Button Margin="5,0" Command="{Binding GenerateXLSCommand}">Generate XLS</Button>
         </StackPanel>
 
         <TextBlock FontSize="12"

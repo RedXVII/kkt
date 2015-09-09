@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.IO;
 using Newtonsoft.Json;
+using NPOI.XSSF.UserModel;
 
 namespace KiriKiriTranslator.Model
 {
@@ -107,6 +108,65 @@ namespace KiriKiriTranslator.Model
             string serializedJson = JsonConvert.SerializeObject(KKLabelGroups, Formatting.Indented);
 
             File.WriteAllText(filePath, serializedJson);
+
+            return true;
+        }
+
+        public bool ExportToXLS(string filePath)
+        {
+            var workBook = new XSSFWorkbook();
+            var ch = workBook.GetCreationHelper();
+            var sheet = workBook.CreateSheet();
+            var cs = workBook.CreateCellStyle();
+            cs.WrapText = true;
+            
+            int rowNumber = 0;
+
+            sheet.SetColumnWidth(0, 256 * 40);
+            sheet.SetColumnWidth(1, 256 * 10);
+            sheet.SetColumnWidth(2, 256 * 90);
+            sheet.SetColumnWidth(3, 256 * 90);
+
+            foreach (var labelGroup in KKLabelGroupsToTranslate.Where(lg => !String.IsNullOrEmpty(lg.TranslatedText)))
+            {
+                var row = sheet.CreateRow(rowNumber);
+
+                // Label Name
+                var labelCell = row.CreateCell(0);
+                labelCell.SetCellValue(labelGroup.Name);
+
+                // Nametag Text
+                var nametagCell = row.CreateCell(1);
+                nametagCell.SetCellValue(labelGroup.NameTag);
+
+                // English text
+                var engCell = row.CreateCell(2);
+                engCell.SetCellValue(ch.CreateRichTextString(labelGroup.TranslatedText));
+                engCell.CellStyle = cs;
+
+                // Japan text
+                var jpCell = row.CreateCell(3);
+                jpCell.SetCellValue(ch.CreateRichTextString(labelGroup.PrintedText));
+                jpCell.CellStyle = cs;
+
+                //row.Height = 256 * 4;
+
+
+
+                rowNumber++;
+            }
+            try
+            {
+                using (FileStream stream = new FileStream(filePath, FileMode.Create, FileAccess.Write))
+                {
+                    workBook.Write(stream);
+                }
+            }
+            catch (IOException e)
+            {
+                return false;
+            }
+            
 
             return true;
         }

@@ -39,6 +39,7 @@ namespace KiriKiriTranslator.ViewModel
 
         public RelayCommand SaveCommand { get; set; }
         public RelayCommand GenerateKKCommand { get; set; }
+        public RelayCommand GenerateXLSCommand { get; set; }
 
 
         /// <summary>
@@ -51,18 +52,25 @@ namespace KiriKiriTranslator.ViewModel
 
             SaveCommand = new RelayCommand(Save);
             GenerateKKCommand = new RelayCommand(GenerateKK);
+            GenerateXLSCommand = new RelayCommand(GenerateXLS);
         }
         
 
         private void Save()
         {
-            _dataService.Save("data.kkt");
+            _dataService.Save(@"D:\data.kkt");
         }
 
         private void GenerateKK()
         {
-            _dataService.SaveToKK("generated.ks");
+            _dataService.SaveToKK("newgame.ks");
         }
+
+        private void GenerateXLS()
+        {
+            _dataService.ExportToXLS(@"Yukikaze_script.xlsx");
+        }
+
 
     }
 }
