@@ -15,8 +15,14 @@ namespace KiriKiriTranslator.Model
             // named characters
             { "ゆきかぜ", "Yukikaze" },
             { "凜子", "Rinko" },
+            { "凜子＆ゆきかぜ", "Rinko & Yukikaze" },
             { "達郎", "Tatsurou" },
             { "矢崎", "Yazaki" },
+            { "アサギ", "Asagi" },
+            { "ゾクト", "Zokuto" },
+            { "リーアル", "Real" },
+            
+            
 
             // random characters
             { "護衛の男たち", "Guards"},
@@ -24,7 +30,7 @@ namespace KiriKiriTranslator.Model
             { "獣人", "Juujin"},
         };
 
-        private static Regex NameRegex = new Regex(@"\[NAME_\w n=""(.+)""\]");
+        private static Regex NameRegex = new Regex(@"(\[NAME_\w n="")(.+)(""\])");
 
         public string Name { get; set; }
         public string PrintedText { get; set; }
@@ -32,32 +38,35 @@ namespace KiriKiriTranslator.Model
         public string PreInstruction { get; set; }
         public string PostInstruction { get; set; }
 
+        private string _nameTag;
+
+        [Newtonsoft.Json.JsonIgnore]
         public string NameTag
         {
             get
             {
-                var match = NameRegex.Match(PreInstruction);
-                if (match.Success)
+                if (_nameTag == null)
                 {
-                    var name = match.Groups[1].Value;
-                    if (NameFilter.ContainsKey(name))
+                    var match = NameRegex.Match(PreInstruction);
+                    if (match.Success)
                     {
-                        name = NameFilter[name];
+                        _nameTag = match.Groups[2].Value;
+                        
                     }
-
-                    return name;
-                }
-                else
-                {
-                    return "";
+                    else
+                    {
+                        _nameTag = "";
+                    }
                 }
 
+                return _nameTag;
             }
         }
 
         private List<KKLine> Lines { get; set; }
 
-        public GalaSoft.MvvmLight.Command.RelayCommand CopyToClipboardCommand { get; set; }
+        [Newtonsoft.Json.JsonIgnore]
+        public GalaSoft.MvvmLight.Command.RelayCommand CopyToClipboardCommand { get; private set; }
 
         public KKLabelGroup()
         {
@@ -111,10 +120,20 @@ namespace KiriKiriTranslator.Model
             PostInstruction = postInstruction.ToString();
         }
 
-        public void WriteToKK(StreamWriter sw)
+        public void WriteToKK(StreamWriter sw, Dictionary<string, string> nameTags)
         {
             sw.WriteLine(this.Name);
-            sw.Write(PreInstruction);
+
+            if (!String.IsNullOrEmpty(this.NameTag) && !String.IsNullOrEmpty(nameTags[NameTag]))
+            {
+                string res = NameRegex.Replace(this.PreInstruction, "$1" + nameTags[NameTag] + "$3");
+                sw.Write(res);
+            }
+            else
+            {
+                sw.Write(PreInstruction);
+            }
+            
 
             if (!String.IsNullOrEmpty(this.PrintedText))
             {

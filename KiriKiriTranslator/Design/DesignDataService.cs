@@ -55,5 +55,18 @@ namespace KiriKiriTranslator.Design
                 return KKLabelGroups.Where(lg => String.IsNullOrEmpty(lg.PrintedText)).ToList();
             }
         }
+
+        public List<KKNameTag> KKNameTags
+        {
+            get
+            {
+                var res = new List<KKNameTag>();
+                res.Add(new KKNameTag { Original = "japanese", Translated = "english" });
+                res.Add(new KKNameTag { Original = "japanese", Translated = "english" });
+                res.Add(new KKNameTag { Original = "japanese", Translated = "english" });
+                return res;
+            }
+        }
+        
     }
 }

@@ -41,6 +41,7 @@ namespace KiriKiriTranslator.ViewModel
         public RelayCommand GenerateKKCommand { get; set; }
         public RelayCommand GenerateXLSCommand { get; set; }
 
+        private System.Threading.Timer _autoSaveTimer;
 
         /// <summary>
         /// Initializes a new instance of the MainViewModel class.
@@ -53,11 +54,29 @@ namespace KiriKiriTranslator.ViewModel
             SaveCommand = new RelayCommand(Save);
             GenerateKKCommand = new RelayCommand(GenerateKK);
             GenerateXLSCommand = new RelayCommand(GenerateXLS);
+            _autoSaveTimer = new System.Threading.Timer(AutoSave, null, 300000, 300000);
+        }
+
+        public override void Cleanup()
+        {
+            _autoSaveTimer.Dispose();
+            base.Cleanup();
+        }
+
+
+        private void AutoSave(object state)
+        {
+            if (_dataService != null)
+            {
+                _dataService.Save(@"D:\autosave.kkt.bak");
+                _dataService.Save(@"D:\autosave.kkt");
+            }
         }
         
 
         private void Save()
         {
+            _dataService.Save(@"D:\data.kkt.bak");
             _dataService.Save(@"D:\data.kkt");
         }
 

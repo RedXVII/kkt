@@ -42,7 +42,15 @@
                    VerticalAlignment="Center"
                    HorizontalAlignment="Center"
                    TextWrapping="Wrap" Margin="48,10,52,2" Grid.Row="1" />
-        <local:LineList Grid.Row="2" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch"/>
+        <TabControl Grid.Row="2" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch">
+            <TabItem Header="Lines">
+                <local:LineList />
+            </TabItem>
+            <TabItem Header="Name Tags">
+                <local:NameTags />
+            </TabItem>
+            <TabItem Header="Choices" />
+        </TabControl>
 
 
 

@@ -48,7 +48,6 @@ namespace KiriKiriTranslator.ViewModel
         {
 
             _dataService = dataService;
-            _dataService.Load(@"D:\data.kkt");
 
             ViewList = new CollectionViewSource();
             ViewList.Source = labelGroupList;

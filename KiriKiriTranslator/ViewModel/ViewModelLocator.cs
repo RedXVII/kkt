@@ -40,6 +40,7 @@ namespace KiriKiriTranslator.ViewModel
 
             SimpleIoc.Default.Register<MainViewModel>();
             SimpleIoc.Default.Register<LineListViewModel>();
+            SimpleIoc.Default.Register<NameTagsViewModel>();
         }
 
         /// <summary>
@@ -69,6 +70,21 @@ namespace KiriKiriTranslator.ViewModel
                 return ServiceLocator.Current.GetInstance<LineListViewModel>();
             }
         }
+
+        /// <summary>
+        /// Gets the LineList property.
+        /// </summary>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance",
+            "CA1822:MarkMembersAsStatic",
+            Justification = "This non-static member is needed for data binding purposes.")]
+        public NameTagsViewModel NameTags
+        {
+            get
+            {
+                return ServiceLocator.Current.GetInstance<NameTagsViewModel>();
+            }
+        }
+
 
         /// <summary>
         /// Cleans up all the resources.

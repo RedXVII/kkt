@@ -9,6 +9,8 @@ namespace KiriKiriTranslator.Model
 {
     public class KKFile : IKKFile
     {
+        private object _lockObject = new object();
+
         private string _currentFilePath;
         public string CurrentFilePath
         {
@@ -31,6 +33,14 @@ namespace KiriKiriTranslator.Model
                 }
                 return _KKLabelGroupsToTranslateCache;
             }
+        }
+
+        
+        public List<KKNameTag> KKNameTags { get; set; }
+
+        public KKFile()
+        {
+            this.Load(@"D:\data.kkt"); //let's never do this again.
         }
 
         public bool LoadFromKK(string filePath)
@@ -84,19 +94,33 @@ namespace KiriKiriTranslator.Model
         {
             string serializedJson = File.ReadAllText(filePath);
 
-            KKLabelGroups = JsonConvert.DeserializeObject<List<KKLabelGroup>>(serializedJson);
+            var JsonFile = JsonConvert.DeserializeObject<KKJsonFile>(serializedJson);
+
+
+            KKLabelGroups = JsonFile.LabelGroups;
             _KKLabelGroupsToTranslateCache = null;
+
+            KKNameTags = JsonFile.NameTags;
+
 
             return true;
         }
 
+  
+
         public bool SaveToKK(string filePath)
         {
+            var nameTagDict = new Dictionary<string ,string>();
+            foreach (var nameTag in KKNameTags)
+            {
+                nameTagDict.Add(nameTag.Original, nameTag.Translated);
+            }
+
             using (var sw = new StreamWriter(filePath, false, System.Text.Encoding.GetEncoding(932)))
             {
                 foreach (var labelGroup in KKLabelGroups)
                 {
-                    labelGroup.WriteToKK(sw);
+                    labelGroup.WriteToKK(sw, nameTagDict);
                 }
             }
 
@@ -105,11 +129,16 @@ namespace KiriKiriTranslator.Model
 
         public bool Save(string filePath)
         {
-            string serializedJson = JsonConvert.SerializeObject(KKLabelGroups, Formatting.Indented);
+            lock (_lockObject)
+            {
+                KKJsonFile JsonFile = new KKJsonFile { LabelGroups = KKLabelGroups, NameTags = KKNameTags };
+                string serializedJson = JsonConvert.SerializeObject(JsonFile, Formatting.Indented);
 
-            File.WriteAllText(filePath, serializedJson);
+                File.WriteAllText(filePath, serializedJson);
 
-            return true;
+                return true;
+            }
+
         }
 
         public bool ExportToXLS(string filePath)
@@ -144,7 +173,7 @@ namespace KiriKiriTranslator.Model
                 engCell.SetCellValue(ch.CreateRichTextString(labelGroup.TranslatedText));
                 engCell.CellStyle = cs;
 
-                // Japan text
+                // Japanese text
                 var jpCell = row.CreateCell(3);
                 jpCell.SetCellValue(ch.CreateRichTextString(labelGroup.PrintedText));
                 jpCell.CellStyle = cs;
@@ -169,6 +198,39 @@ namespace KiriKiriTranslator.Model
             
 
             return true;
+        }
+
+        private List<KKNameTag> LoadNamesFromDictionary(Dictionary<string, string> dict)
+        {
+            var res = new List<KKNameTag>();
+
+            foreach (var pair in dict)
+            {
+                res.Add(new KKNameTag { Original = pair.Key, Translated = pair.Value });
+            }
+
+            return res;
+        }
+
+        private Dictionary<string, string> LoadNamesFromLabels(List<KKLabelGroup> labelGroups)
+        {
+            Dictionary<string, string> res = new Dictionary<string, string>();
+            foreach (var labelGroup in labelGroups)
+            {
+                if (!String.IsNullOrEmpty(labelGroup.NameTag) && !res.ContainsKey(labelGroup.NameTag))
+                {
+
+                    res.Add(labelGroup.NameTag, null);
+                }
+            }
+
+            return res;
+        }
+
+        public class KKJsonFile
+        {
+            public List<KKLabelGroup> LabelGroups { get; set; }
+            public List<KKNameTag> NameTags { get; set; }
         }
     }
 }
