@@ -102,23 +102,33 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Choices.xaml.cs">
+      <DependentUpon>Choices.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Design\DesignDataService.cs" />
     <Compile Include="LineList.xaml.cs">
       <DependentUpon>LineList.xaml</DependentUpon>
     </Compile>
     <Compile Include="Model\DataItem.cs" />
+    <Compile Include="Model\KKChoice.cs" />
     <Compile Include="Model\KKLabelGroup.cs" />
     <Compile Include="Model\KKLine.cs" />
     <Compile Include="Model\KKFile.cs" />
     <Compile Include="Model\IKKFile.cs" />
     <Compile Include="Model\KKNameTag.cs" />
+    <Compile Include="Model\KKOutputFile.cs" />
     <Compile Include="NameTags.xaml.cs">
       <DependentUpon>NameTags.xaml</DependentUpon>
     </Compile>
+    <Compile Include="ViewModel\ChoicesViewModel.cs" />
     <Compile Include="ViewModel\LineListViewModel.cs" />
     <Compile Include="ViewModel\MainViewModel.cs" />
     <Compile Include="ViewModel\NameTagsViewModel.cs" />
     <Compile Include="ViewModel\ViewModelLocator.cs" />
+    <Page Include="Choices.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="LineList.xaml">
       <SubType>Form</SubType>
       <Generator>MSBuild:Compile</Generator>

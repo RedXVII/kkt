@@ -10,25 +10,6 @@ namespace KiriKiriTranslator.Model
 {
     public class KKLabelGroup
     {
-        public static Dictionary<string, string> NameFilter = new Dictionary<string,string>()
-        {
-            // named characters
-            { "ゆきかぜ", "Yukikaze" },
-            { "凜子", "Rinko" },
-            { "凜子＆ゆきかぜ", "Rinko & Yukikaze" },
-            { "達郎", "Tatsurou" },
-            { "矢崎", "Yazaki" },
-            { "アサギ", "Asagi" },
-            { "ゾクト", "Zokuto" },
-            { "リーアル", "Real" },
-            
-            
-
-            // random characters
-            { "護衛の男たち", "Guards"},
-            { "老人", "Old man"},
-            { "獣人", "Juujin"},
-        };
 
         private static Regex NameRegex = new Regex(@"(\[NAME_\w n="")(.+)(""\])");
 
@@ -120,19 +101,27 @@ namespace KiriKiriTranslator.Model
             PostInstruction = postInstruction.ToString();
         }
 
-        public void WriteToKK(StreamWriter sw, Dictionary<string, string> nameTags)
+        public void WriteToKK(StreamWriter sw, Dictionary<string, string> nameTags, List<KKChoice> choices)
         {
             sw.WriteLine(this.Name);
 
+            string preInstruction = PreInstruction;
             if (!String.IsNullOrEmpty(this.NameTag) && !String.IsNullOrEmpty(nameTags[NameTag]))
             {
-                string res = NameRegex.Replace(this.PreInstruction, "$1" + nameTags[NameTag] + "$3");
-                sw.Write(res);
+                preInstruction = NameRegex.Replace(preInstruction, "$1" + nameTags[NameTag] + "$3");
             }
-            else
+
+            var choice = choices.Where(c => c.Label == this.Name).FirstOrDefault();
+            if (choice != null)
             {
-                sw.Write(PreInstruction);
+                
+                preInstruction = preInstruction.Replace("\"" + choice.OriginalText + "\"", "\"" + choice.TranslatedText + "\"");
+                foreach (var subchoice in choice.SubChoices)
+                {
+                    preInstruction = preInstruction.Replace("\"" + subchoice.Original + "\"", "\"" + subchoice.Translated + "\"");
+                }
             }
+            sw.Write(preInstruction);
             
 
             if (!String.IsNullOrEmpty(this.PrintedText))

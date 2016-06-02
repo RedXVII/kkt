@@ -67,6 +67,18 @@ namespace KiriKiriTranslator.Design
                 return res;
             }
         }
-        
+
+        public List<KKChoice> KKChoices
+        {
+            get
+            {
+                var res = new List<KKChoice>();
+                res.Add(new KKChoice { OriginalText = "japanese", TranslatedText = "english" });
+                res.Add(new KKChoice { OriginalText = "japanese", TranslatedText = "english" });
+                res.Add(new KKChoice { OriginalText = "japanese", TranslatedText = "english" });
+                return res;
+            }
+        }
+
     }
 }

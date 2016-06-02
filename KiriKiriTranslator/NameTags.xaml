@@ -8,23 +8,25 @@
              mc:Ignorable="d" 
              d:DesignHeight="600" d:DesignWidth="900"
              DataContext="{Binding NameTags, Source={StaticResource Locator}}">
-    <Grid>
-        <ItemsControl x:Name="TestList" ItemsSource="{Binding ViewList.View}">
-            <ItemsControl.ItemTemplate>
-                <DataTemplate DataType="kkmodel:KKNameTag">
-                    <Grid ShowGridLines="True">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="auto"></RowDefinition>
-                        </Grid.RowDefinitions>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="200"/>
-                            <ColumnDefinition Width="200"/>
-                        </Grid.ColumnDefinitions>
-                        <TextBox IsReadOnly="True" Grid.Column="0" Text="{Binding Original}" />
-                        <TextBox Grid.Column="1" Text="{Binding Path=Translated, Mode=TwoWay}" AcceptsReturn="True" />
-                    </Grid>
-                </DataTemplate>
-            </ItemsControl.ItemTemplate>
-        </ItemsControl>
-    </Grid>
+    <ScrollViewer>
+        <Grid>
+            <ItemsControl x:Name="TestList" ItemsSource="{Binding ViewList.View}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate DataType="kkmodel:KKNameTag">
+                        <Grid ShowGridLines="True">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="auto"></RowDefinition>
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="200"/>
+                                <ColumnDefinition Width="200"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBox IsReadOnly="True" Grid.Column="0" Text="{Binding Original}" />
+                            <TextBox Grid.Column="1" Text="{Binding Path=Translated, Mode=TwoWay}" AcceptsReturn="True" />
+                        </Grid>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </Grid>
+    </ScrollViewer>
 </UserControl>

@@ -9,40 +9,47 @@
         mc:Ignorable="d ignore"
         d:DesignHeight="600" d:DesignWidth="900"
         DataContext="{Binding LineList, Source={StaticResource Locator}}">
-    <StackPanel Orientation="Vertical">
-        <StackPanel Orientation="Horizontal">
-            <Button Margin="5,0" Command="{Binding PreviousPageCommand}">Previous</Button>
-            <TextBlock>Page</TextBlock>
-            <TextBox Text="{Binding RequestedPage}"></TextBox>
-            <TextBlock>/</TextBlock>
-            <TextBlock Text="{Binding MaxPage}"></TextBlock>
-            <Button Margin="5,0" Command="{Binding JumpToPageCommand}">Jump</Button>
-            <Button Margin="5,0" Command="{Binding NextPageCommand}">Next</Button>
-            
-            
-        </StackPanel>
-        <ItemsControl x:Name="TestList" ItemsSource="{Binding ViewList.View}">
-            <ItemsControl.ItemTemplate>
-                <DataTemplate DataType="kkmodel:KKLabelGroup">
-                    <Grid ShowGridLines="True">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="auto"></RowDefinition>
-                        </Grid.RowDefinitions>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="150"/>
-                            <ColumnDefinition Width="50"/>
-                            <ColumnDefinition Width="350"/>
-                            <ColumnDefinition Width="400"/>
-                        </Grid.ColumnDefinitions>
-                        <TextBlock Grid.Column="0" Text="{Binding Name}" />
-                        <Button Command="{Binding CopyToClipboardCommand}" Grid.Column="1">Copy</Button>
-                        <TextBox IsReadOnly="True" Grid.Column="2" Text="{Binding PrintedText}" />
-                        <TextBox Grid.Column="3" Text="{Binding Path=TranslatedText, Mode=TwoWay}" AcceptsReturn="True" />
-                    </Grid>
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Orientation="Vertical">
+            <StackPanel Orientation="Horizontal">
+                <Button Margin="5,0" Command="{Binding PreviousPageCommand}">Previous</Button>
+                <TextBlock>Page</TextBlock>
+                <TextBox Text="{Binding RequestedPage, UpdateSourceTrigger=PropertyChanged}" >
+                    <TextBox.InputBindings>
+                        <KeyBinding Key="Enter" Command="{Binding JumpToPageCommand}"/>
+                    </TextBox.InputBindings>
+                </TextBox>
+                <TextBlock>/</TextBlock>
+                <TextBlock Text="{Binding MaxPage}"></TextBlock>
+                <Button Margin="5,0" Command="{Binding JumpToPageCommand}">Jump</Button>
+                <Button Margin="5,0" Command="{Binding NextPageCommand}">Next</Button>
 
-                </DataTemplate>
-            </ItemsControl.ItemTemplate>
-        </ItemsControl>
-    </StackPanel>
-    
+
+            </StackPanel>
+            <ItemsControl x:Name="TestList" ItemsSource="{Binding ViewList.View}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate DataType="kkmodel:KKLabelGroup">
+
+                            <Grid ShowGridLines="True">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition ></RowDefinition>
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="150"/>
+                                    <ColumnDefinition Width="50"/>
+                                    <ColumnDefinition Width="350"/>
+                                    <ColumnDefinition Width="400"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Text="{Binding Name}" />
+                                <Button Command="{Binding CopyToClipboardCommand}" Grid.Column="1">Copy</Button>
+                                <TextBox IsReadOnly="True" Grid.Column="2" Text="{Binding PrintedText}" />
+                                <TextBox Grid.Column="3" Text="{Binding Path=TranslatedText, Mode=TwoWay}" AcceptsReturn="True" />
+                            </Grid>
+
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+        </StackPanel>
+    </ScrollViewer>
+
 </UserControl>

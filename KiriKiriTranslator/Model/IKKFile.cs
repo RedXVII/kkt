@@ -22,5 +22,6 @@ namespace KiriKiriTranslator.Model
         List<KKLabelGroup> KKLabelGroups { get; }
         List<KKLabelGroup> KKLabelGroupsToTranslate { get; }
         List<KKNameTag> KKNameTags { get; }
+        List<KKChoice> KKChoices { get; }
     }
 }

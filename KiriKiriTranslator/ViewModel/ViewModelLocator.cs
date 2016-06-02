@@ -41,6 +41,7 @@ namespace KiriKiriTranslator.ViewModel
             SimpleIoc.Default.Register<MainViewModel>();
             SimpleIoc.Default.Register<LineListViewModel>();
             SimpleIoc.Default.Register<NameTagsViewModel>();
+            SimpleIoc.Default.Register<ChoicesViewModel>();
         }
 
         /// <summary>
@@ -72,7 +73,7 @@ namespace KiriKiriTranslator.ViewModel
         }
 
         /// <summary>
-        /// Gets the LineList property.
+        /// Gets the NameTags property.
         /// </summary>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance",
             "CA1822:MarkMembersAsStatic",
@@ -82,6 +83,20 @@ namespace KiriKiriTranslator.ViewModel
             get
             {
                 return ServiceLocator.Current.GetInstance<NameTagsViewModel>();
+            }
+        }
+
+        /// <summary>
+        /// Gets the Choices property.
+        /// </summary>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance",
+            "CA1822:MarkMembersAsStatic",
+            Justification = "This non-static member is needed for data binding purposes.")]
+        public ChoicesViewModel Choices
+        {
+            get
+            {
+                return ServiceLocator.Current.GetInstance<ChoicesViewModel>();
             }
         }
 

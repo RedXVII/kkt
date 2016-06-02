@@ -4,6 +4,7 @@ using System.Linq;
 using System.IO;
 using Newtonsoft.Json;
 using NPOI.XSSF.UserModel;
+using System.Text.RegularExpressions;
 
 namespace KiriKiriTranslator.Model
 {
@@ -35,8 +36,12 @@ namespace KiriKiriTranslator.Model
             }
         }
 
-        
+
         public List<KKNameTag> KKNameTags { get; set; }
+
+        public List<KKOutputFile> KKOutputFiles { get; set; }
+
+        public List<KKChoice> KKChoices { get; set; }
 
         public KKFile()
         {
@@ -97,11 +102,14 @@ namespace KiriKiriTranslator.Model
             var JsonFile = JsonConvert.DeserializeObject<KKJsonFile>(serializedJson);
 
 
-            KKLabelGroups = JsonFile.LabelGroups;
+            KKOutputFiles = JsonFile.OutputFiles;
+
+            KKLabelGroups = KKOutputFiles.SelectMany(file => file.Labels).ToList();
             _KKLabelGroupsToTranslateCache = null;
 
             KKNameTags = JsonFile.NameTags;
 
+            KKChoices = JsonFile.Choices;
 
             return true;
         }
@@ -120,7 +128,7 @@ namespace KiriKiriTranslator.Model
             {
                 foreach (var labelGroup in KKLabelGroups)
                 {
-                    labelGroup.WriteToKK(sw, nameTagDict);
+                    labelGroup.WriteToKK(sw, nameTagDict, this.KKChoices);
                 }
             }
 
@@ -131,9 +139,8 @@ namespace KiriKiriTranslator.Model
         {
             lock (_lockObject)
             {
-                KKJsonFile JsonFile = new KKJsonFile { LabelGroups = KKLabelGroups, NameTags = KKNameTags };
+                KKJsonFile JsonFile = new KKJsonFile { OutputFiles = KKOutputFiles, NameTags = KKNameTags, Choices = KKChoices };
                 string serializedJson = JsonConvert.SerializeObject(JsonFile, Formatting.Indented);
-
                 File.WriteAllText(filePath, serializedJson);
 
                 return true;
@@ -156,7 +163,7 @@ namespace KiriKiriTranslator.Model
             sheet.SetColumnWidth(2, 256 * 90);
             sheet.SetColumnWidth(3, 256 * 90);
 
-            foreach (var labelGroup in KKLabelGroupsToTranslate.Where(lg => !String.IsNullOrEmpty(lg.TranslatedText)))
+            foreach (var labelGroup in KKLabelGroupsToTranslate)
             {
                 var row = sheet.CreateRow(rowNumber);
 
@@ -227,10 +234,37 @@ namespace KiriKiriTranslator.Model
             return res;
         }
 
+        private static Regex ChoiceRegex = new Regex(@"\[SELECT_CENTER text=""([^""]*)""(?:.*?)sel_1=""([^""]*)""(?:.*?)sel_2=""([^""]*)""(?:.*?)(?:sel_3=""([^""]*)""(?:.*?))?\]");
+
+        private List<KKChoice> LoadChoicesFromLabels(List<KKLabelGroup> labelGroups)
+        {
+            List<KKChoice> res = new List<KKChoice>();
+            foreach (var labelGroup in labelGroups)
+            {
+                if (!String.IsNullOrEmpty(labelGroup.PreInstruction))
+                {
+                    Match match = ChoiceRegex.Match(labelGroup.PreInstruction);
+                    if (match.Success)
+                    {
+                        KKChoice newChoice = new KKChoice { Label = labelGroup.Name, OriginalText = match.Groups[1].Value };
+                        newChoice.AddSubChoice(match.Groups[2].Value);
+                        newChoice.AddSubChoice(match.Groups[3].Value);
+                        if (match.Groups[4].Success)
+                        {
+                            newChoice.AddSubChoice(match.Groups[4].Value);
+                        }
+                        res.Add(newChoice);
+                    }
+                }
+            }
+            return res;
+        }
+
         public class KKJsonFile
         {
-            public List<KKLabelGroup> LabelGroups { get; set; }
+            public List<KKOutputFile> OutputFiles { get; set; }
             public List<KKNameTag> NameTags { get; set; }
+            public List<KKChoice> Choices { get; set; }
         }
     }
 }
