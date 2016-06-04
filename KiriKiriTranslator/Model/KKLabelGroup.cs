@@ -13,11 +13,46 @@ namespace KiriKiriTranslator.Model
 
         private static Regex NameRegex = new Regex(@"(\[NAME_\w n="")(.+)(""\])");
 
-        public string Name { get; set; }
+        private string _name;
+        private string _nameWithoutChapter;
+        private string _chapter;
+
+        public string Name
+        {
+            get { return _name; }
+            set
+            {
+                _name = value;
+                var tab = _name.Split(new char[] { '|' }, 2);
+                _nameWithoutChapter = tab[0];
+                if (tab.Length > 1)
+                {
+                    _chapter = tab[1];
+                }
+            }
+        }
+
         public string PrintedText { get; set; }
         public string TranslatedText { get; set; }
         public string PreInstruction { get; set; }
         public string PostInstruction { get; set; }
+
+        public string Alias { get; set; }
+        [Newtonsoft.Json.JsonIgnore]
+        public string AliasedText { get; set; }
+
+
+        [Newtonsoft.Json.JsonIgnore]
+        public string NameWithoutChapter 
+        {
+            get { return _nameWithoutChapter; }
+        }
+
+        [Newtonsoft.Json.JsonIgnore]
+        public string Chapter
+        {
+            get { return _chapter; }
+        }
 
         private string _nameTag;
 
@@ -101,9 +136,22 @@ namespace KiriKiriTranslator.Model
             PostInstruction = postInstruction.ToString();
         }
 
-        public void WriteToKK(StreamWriter sw, Dictionary<string, string> nameTags, List<KKChoice> choices)
+        public void WriteToKK(StreamWriter sw, Dictionary<string, string> nameTags, List<KKChoice> choices, Dictionary<string, string> chapterNames)
         {
-            sw.WriteLine(this.Name);
+            string translatedChapterName = null;
+            if (!String.IsNullOrEmpty(this.Chapter))
+            {
+                chapterNames.TryGetValue(this.Chapter, out translatedChapterName);
+            }
+            if (translatedChapterName != null)
+            {
+                sw.WriteLine(this.NameWithoutChapter + "|" + translatedChapterName);
+            }
+            else
+            {
+                sw.WriteLine(this.Name);
+            }
+            
 
             string preInstruction = PreInstruction;
             if (!String.IsNullOrEmpty(this.NameTag) && !String.IsNullOrEmpty(nameTags[NameTag]))
@@ -126,7 +174,11 @@ namespace KiriKiriTranslator.Model
 
             if (!String.IsNullOrEmpty(this.PrintedText))
             {
-                if (!String.IsNullOrEmpty(this.TranslatedText))
+                if (!String.IsNullOrEmpty(this.AliasedText))
+                {
+                    sw.Write(AliasedText);
+                }
+                else if (!String.IsNullOrEmpty(this.TranslatedText))
                 {
                     sw.Write(TranslatedText);
                 }

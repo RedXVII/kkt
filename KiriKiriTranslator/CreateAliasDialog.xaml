@@ -1,0 +1,36 @@
+﻿<Window x:Class="KiriKiriTranslator.CreateAliasDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:KiriKiriTranslator"
+        mc:Ignorable="d"
+        Title="Create Alias" Height="300" Width="300">
+    <Grid Margin="5">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+
+        <Label>Enter label to alias:</Label>
+        <TextBox Name="labelToAlias"  Grid.Row="1" MinWidth="250">Label_origin</TextBox>
+        <Label Grid.Row="2">Enter label destination:</Label>
+        <TextBox Name="labelDestination"  Grid.Row="3" MinWidth="250">Label_destination</TextBox>
+        <Label Grid.Row="4">Enter length:</Label>
+        <TextBox Name="labelAliasLength"  Grid.Row="5" MinWidth="250">0</TextBox>
+
+        <WrapPanel Grid.Row="6"  HorizontalAlignment="Right" Margin="0,15,0,0">
+            <Button IsDefault="True" Name="btnDialogOk" Click="btnDialogOk_Click" MinWidth="60" Margin="0,0,10,0">_Ok</Button>
+            <Button IsCancel="True" MinWidth="60">_Cancel</Button>
+        </WrapPanel>
+    </Grid>
+</Window>

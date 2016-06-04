@@ -40,6 +40,8 @@ namespace KiriKiriTranslator.ViewModel
         public RelayCommand SaveCommand { get; set; }
         public RelayCommand GenerateKKCommand { get; set; }
         public RelayCommand GenerateXLSCommand { get; set; }
+        public RelayCommand CreateLabelAliasCommand { get; set; }
+        public RelayCommand DestroyLabelAliasCommand { get; set; }
 
         private System.Threading.Timer _autoSaveTimer;
 
@@ -54,6 +56,8 @@ namespace KiriKiriTranslator.ViewModel
             SaveCommand = new RelayCommand(Save);
             GenerateKKCommand = new RelayCommand(GenerateKK);
             GenerateXLSCommand = new RelayCommand(GenerateXLS);
+            CreateLabelAliasCommand = new RelayCommand(CreateLabelAlias);
+            DestroyLabelAliasCommand = new RelayCommand(DestroyLabelAlias);
             _autoSaveTimer = new System.Threading.Timer(AutoSave, null, 300000, 300000);
         }
 
@@ -82,7 +86,7 @@ namespace KiriKiriTranslator.ViewModel
 
         private void GenerateKK()
         {
-            _dataService.SaveToKK("newgame.ks");
+            _dataService.SaveToKK(".");
         }
 
         private void GenerateXLS()
@@ -90,6 +94,19 @@ namespace KiriKiriTranslator.ViewModel
             _dataService.ExportToXLS(@"Yukikaze_script.xlsx");
         }
 
+        private void CreateLabelAlias()
+        {
+            CreateAliasDialog inputDialog = new CreateAliasDialog();
+            if (inputDialog.ShowDialog() == true)
+            {
+                _dataService.CreateLabelAlias(inputDialog.LabelToAlias, inputDialog.LabelDestination, inputDialog.LabelAliasLength);
+            }
+        }
+
+        private void DestroyLabelAlias()
+        {
+
+        }
 
     }
 }

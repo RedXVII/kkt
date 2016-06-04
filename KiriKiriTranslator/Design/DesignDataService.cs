@@ -36,6 +36,18 @@ namespace KiriKiriTranslator.Design
             return true;
         }
 
+        public bool CreateLabelAlias(string labelToAlias, string labelDestination, int aliasLength)
+        {
+            return true;
+        }
+
+        public bool DestroyLabelAlias(string labelToAlias, int aliasLength)
+        {
+
+            return true;
+        }
+
+
         public List<KKLabelGroup> KKLabelGroups
         {
             get
@@ -79,6 +91,19 @@ namespace KiriKiriTranslator.Design
                 return res;
             }
         }
+
+        public List<KKChapterName> KKChapterNames
+        {
+            get
+            {
+                var res = new List<KKChapterName>();
+                res.Add(new KKChapterName { Original = "japanese", Translated = "english" });
+                res.Add(new KKChapterName { Original = "japanese", Translated = "english" });
+                res.Add(new KKChapterName { Original = "japanese", Translated = "english" });
+                return res;
+            }
+        }
+
 
     }
 }

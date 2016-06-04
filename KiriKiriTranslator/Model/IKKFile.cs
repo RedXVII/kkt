@@ -19,9 +19,13 @@ namespace KiriKiriTranslator.Model
 
         bool ExportToXLS(string filePath);
 
+        bool CreateLabelAlias(string labelToAlias, string labelDestination, int aliasLength);
+        bool DestroyLabelAlias(string labelToAlias, int aliasLength);
+
         List<KKLabelGroup> KKLabelGroups { get; }
         List<KKLabelGroup> KKLabelGroupsToTranslate { get; }
         List<KKNameTag> KKNameTags { get; }
         List<KKChoice> KKChoices { get; }
+        List<KKChapterName> KKChapterNames { get; }
     }
 }

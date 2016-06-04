@@ -102,14 +102,21 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="ChapterNames.xaml.cs">
+      <DependentUpon>ChapterNames.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Choices.xaml.cs">
       <DependentUpon>Choices.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="CreateAliasDialog.xaml.cs">
+      <DependentUpon>CreateAliasDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="Design\DesignDataService.cs" />
     <Compile Include="LineList.xaml.cs">
       <DependentUpon>LineList.xaml</DependentUpon>
     </Compile>
     <Compile Include="Model\DataItem.cs" />
+    <Compile Include="Model\KKChapterName.cs" />
     <Compile Include="Model\KKChoice.cs" />
     <Compile Include="Model\KKLabelGroup.cs" />
     <Compile Include="Model\KKLine.cs" />
@@ -120,12 +127,21 @@
     <Compile Include="NameTags.xaml.cs">
       <DependentUpon>NameTags.xaml</DependentUpon>
     </Compile>
+    <Compile Include="ViewModel\ChapterNamesViewModel.cs" />
     <Compile Include="ViewModel\ChoicesViewModel.cs" />
     <Compile Include="ViewModel\LineListViewModel.cs" />
     <Compile Include="ViewModel\MainViewModel.cs" />
     <Compile Include="ViewModel\NameTagsViewModel.cs" />
     <Compile Include="ViewModel\ViewModelLocator.cs" />
+    <Page Include="ChapterNames.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Choices.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="CreateAliasDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

@@ -19,7 +19,6 @@ namespace KiriKiriTranslator.Model
             set { _currentFilePath = value; }
         }
 
-        private List<KKLine> KKLines { get; set; }
         public List<KKLabelGroup> KKLabelGroups { get; private set; }
 
         private List<KKLabelGroup> _KKLabelGroupsToTranslateCache;
@@ -43,6 +42,8 @@ namespace KiriKiriTranslator.Model
 
         public List<KKChoice> KKChoices { get; set; }
 
+        public List<KKChapterName> KKChapterNames { get; set; }
+
         public KKFile()
         {
             this.Load(@"D:\data.kkt"); //let's never do this again.
@@ -50,11 +51,13 @@ namespace KiriKiriTranslator.Model
 
         public bool LoadFromKK(string filePath)
         {
-            KKLines = new List<KKLine>();
-            _KKLabelGroupsToTranslateCache = null;
-            KKLabelGroups = new List<KKLabelGroup>();
+            if (KKLabelGroups == null)
+            {
+                KKLabelGroups = new List<KKLabelGroup>();
+            }
 
-                
+            KKOutputFile outputFile = new KKOutputFile() { FileName = System.IO.Path.GetFileName(filePath) };
+            outputFile.Labels = new List<KKLabelGroup>();
 
             var lines = File.ReadLines(filePath, System.Text.Encoding.GetEncoding(932)); //SHIFT-JIS
             int lineNumber = 1;
@@ -73,7 +76,7 @@ namespace KiriKiriTranslator.Model
                     if (currentGroup != null)
                     {
                         currentGroup.Compute();
-                        KKLabelGroups.Add(currentGroup);
+                        outputFile.Labels.Add(currentGroup);
                     }
                     currentGroup = new KKLabelGroup(newLine.Label);
                 }
@@ -82,15 +85,19 @@ namespace KiriKiriTranslator.Model
                 {
                     currentGroup.Append(newLine);
                 }
-                
-                KKLines.Add(newLine);
+
                 lineNumber++;
             }
             if (currentGroup != null)
             {
                 currentGroup.Compute();
-                KKLabelGroups.Add(currentGroup);
+                outputFile.Labels.Add(currentGroup);
             }
+
+            KKOutputFiles.Add(outputFile);
+            KKLabelGroups.AddRange(outputFile.Labels);
+            _KKLabelGroupsToTranslateCache = null;
+            RefreshChapterNames();
 
             return true;
 
@@ -106,17 +113,20 @@ namespace KiriKiriTranslator.Model
 
             KKLabelGroups = KKOutputFiles.SelectMany(file => file.Labels).ToList();
             _KKLabelGroupsToTranslateCache = null;
+            this.RefreshAliasText();
 
             KKNameTags = JsonFile.NameTags;
 
             KKChoices = JsonFile.Choices;
+
+            KKChapterNames = JsonFile.ChapterNames;
 
             return true;
         }
 
   
 
-        public bool SaveToKK(string filePath)
+        public bool SaveToKK(string folderPath)
         {
             var nameTagDict = new Dictionary<string ,string>();
             foreach (var nameTag in KKNameTags)
@@ -124,13 +134,24 @@ namespace KiriKiriTranslator.Model
                 nameTagDict.Add(nameTag.Original, nameTag.Translated);
             }
 
-            using (var sw = new StreamWriter(filePath, false, System.Text.Encoding.GetEncoding(932)))
+            var chapterNameDict = new Dictionary<string, string>();
+            foreach (var chapter in KKChapterNames)
             {
-                foreach (var labelGroup in KKLabelGroups)
+                chapterNameDict.Add(chapter.Original, chapter.Translated);
+            }
+
+            foreach (KKOutputFile file in KKOutputFiles)
+            {
+                using (var sw = new StreamWriter( System.IO.Path.Combine(folderPath, file.FileName), false, System.Text.Encoding.GetEncoding(932)))
                 {
-                    labelGroup.WriteToKK(sw, nameTagDict, this.KKChoices);
+                    foreach (var labelGroup in file.Labels)
+                    {
+                        labelGroup.WriteToKK(sw, nameTagDict, this.KKChoices, chapterNameDict);
+                    }
                 }
             }
+
+            
 
             return true;
         }
@@ -139,7 +160,7 @@ namespace KiriKiriTranslator.Model
         {
             lock (_lockObject)
             {
-                KKJsonFile JsonFile = new KKJsonFile { OutputFiles = KKOutputFiles, NameTags = KKNameTags, Choices = KKChoices };
+                KKJsonFile JsonFile = new KKJsonFile { OutputFiles = KKOutputFiles, NameTags = KKNameTags, Choices = KKChoices, ChapterNames = KKChapterNames };
                 string serializedJson = JsonConvert.SerializeObject(JsonFile, Formatting.Indented);
                 File.WriteAllText(filePath, serializedJson);
 
@@ -207,6 +228,69 @@ namespace KiriKiriTranslator.Model
             return true;
         }
 
+        public bool CreateLabelAlias(string labelToAlias, string labelDestination, int aliasLength)
+        {
+            int toAliasIndex = KKLabelGroups.FindIndex(label => label.NameWithoutChapter == labelToAlias);
+            int destinationIndex = KKLabelGroups.FindIndex(label => label.NameWithoutChapter == labelDestination);
+
+            if (toAliasIndex == -1 || destinationIndex == -1)
+                return false;
+
+            for (int i = 0; i < aliasLength; i++)
+            {
+                while (string.IsNullOrEmpty(KKLabelGroups[toAliasIndex].PrintedText))
+                    toAliasIndex++;
+                while (string.IsNullOrEmpty(KKLabelGroups[destinationIndex].PrintedText))
+                    destinationIndex++;
+
+                KKLabelGroups[toAliasIndex].Alias = KKLabelGroups[destinationIndex].NameWithoutChapter;
+
+                toAliasIndex++;
+                destinationIndex++;
+            }
+
+            RefreshAliasText();
+            return true;
+        }
+
+        public bool DestroyLabelAlias(string labelToAlias, int aliasLength)
+        {
+
+            return true;
+        }
+
+
+        private void RefreshAliasText()
+        {
+            foreach (var label in KKLabelGroups)
+            {
+                if (!string.IsNullOrEmpty(label.Alias))
+                {
+                    var originalLabel = KKLabelGroups.Where(l => l.NameWithoutChapter == label.Alias).FirstOrDefault();
+                    if (originalLabel != null)
+                    {
+                        label.AliasedText = originalLabel.TranslatedText;
+                    }
+                }
+            }
+        }
+
+        private void RefreshChapterNames()
+        {
+            if (KKChapterNames == null)
+            {
+                KKChapterNames = new List<KKChapterName>();
+            }
+            foreach (KKLabelGroup label in KKLabelGroups)
+            {
+                if (!string.IsNullOrEmpty(label.Chapter) && !KKChapterNames.Exists(ch => ch.Original == label.Chapter))
+                {
+                    KKChapterNames.Add(new KKChapterName() { Original = label.Chapter });
+                }
+            }
+        }
+
+
         private List<KKNameTag> LoadNamesFromDictionary(Dictionary<string, string> dict)
         {
             var res = new List<KKNameTag>();
@@ -265,6 +349,7 @@ namespace KiriKiriTranslator.Model
             public List<KKOutputFile> OutputFiles { get; set; }
             public List<KKNameTag> NameTags { get; set; }
             public List<KKChoice> Choices { get; set; }
+            public List<KKChapterName> ChapterNames { get; set; }
         }
     }
 }

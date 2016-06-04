@@ -42,6 +42,7 @@ namespace KiriKiriTranslator.ViewModel
             SimpleIoc.Default.Register<LineListViewModel>();
             SimpleIoc.Default.Register<NameTagsViewModel>();
             SimpleIoc.Default.Register<ChoicesViewModel>();
+            SimpleIoc.Default.Register<ChapterNamesViewModel>();
         }
 
         /// <summary>
@@ -100,6 +101,19 @@ namespace KiriKiriTranslator.ViewModel
             }
         }
 
+        /// <summary>
+        /// Gets the NameTags property.
+        /// </summary>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance",
+            "CA1822:MarkMembersAsStatic",
+            Justification = "This non-static member is needed for data binding purposes.")]
+        public ChapterNamesViewModel ChapterNames
+        {
+            get
+            {
+                return ServiceLocator.Current.GetInstance<ChapterNamesViewModel>();
+            }
+        }
 
         /// <summary>
         /// Cleans up all the resources.
