@@ -151,6 +151,8 @@ namespace KiriKiriTranslator.Model
                 chapterNameDict.Add(chapter.Original, chapter.Translated);
             }
 
+            Directory.CreateDirectory(folderPath);
+
             foreach (KKOutputFile file in KKOutputFiles)
             {
                 using (var sw = new StreamWriter( System.IO.Path.Combine(folderPath, file.FileName), false, System.Text.Encoding.GetEncoding(932)))
