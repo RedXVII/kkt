@@ -31,13 +31,16 @@ namespace KiriKiriTranslator.ViewModel
             ViewList = new CollectionViewSource();
             ViewList.Source = chapterNameList;
 
+            RefreshView();
+        }
 
+        public void RefreshView()
+        {
+            chapterNameList.Clear();
             foreach (KKChapterName chapterName in _dataService.KKChapterNames)
             {
                 chapterNameList.Add(chapterName);
             }
-
-
         }
     }
 }

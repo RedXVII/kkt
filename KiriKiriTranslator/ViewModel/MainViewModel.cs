@@ -1,5 +1,6 @@
 ﻿using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
+using GalaSoft.MvvmLight.Ioc;
 using KiriKiriTranslator.Model;
 
 namespace KiriKiriTranslator.ViewModel
@@ -38,6 +39,7 @@ namespace KiriKiriTranslator.ViewModel
         }
 
         public RelayCommand SaveCommand { get; set; }
+        public RelayCommand AddKKFileCommand { get; set; }
         public RelayCommand GenerateKKCommand { get; set; }
         public RelayCommand GenerateXLSCommand { get; set; }
         public RelayCommand CreateLabelAliasCommand { get; set; }
@@ -51,9 +53,10 @@ namespace KiriKiriTranslator.ViewModel
         public MainViewModel(IKKFile dataService)
         {
             _dataService = dataService;
-            WelcomeTitle = "Do it for her.";
+            WelcomeTitle = "One step at a time.";
 
             SaveCommand = new RelayCommand(Save);
+            AddKKFileCommand = new RelayCommand(AddKKFile);
             GenerateKKCommand = new RelayCommand(GenerateKK);
             GenerateXLSCommand = new RelayCommand(GenerateXLS);
             CreateLabelAliasCommand = new RelayCommand(CreateLabelAlias);
@@ -72,21 +75,37 @@ namespace KiriKiriTranslator.ViewModel
         {
             if (_dataService != null)
             {
-                _dataService.Save(@"D:\autosave.kkt.bak");
-                _dataService.Save(@"D:\autosave.kkt");
+                _dataService.Save(@"autosave.kkt.bak");
+                _dataService.Save(@"autosave.kkt");
             }
         }
         
 
         private void Save()
         {
-            _dataService.Save(@"D:\data.kkt.bak");
-            _dataService.Save(@"D:\data.kkt");
+            _dataService.Save(@"data.kkt.bak");
+            _dataService.Save(@"data.kkt");
+        }
+
+        private void AddKKFile()
+        {
+            var fileDialog = new Microsoft.Win32.OpenFileDialog();
+            fileDialog.DefaultExt = ".ks";
+            fileDialog.Filter = "Kirikiri script (*.ks)|*.ks";
+
+            var result = fileDialog.ShowDialog();
+            if (result == true)
+            {
+                if (_dataService.LoadFromKK(fileDialog.FileName))
+                {
+                    RefreshAllTabs();
+                }
+            }
         }
 
         private void GenerateKK()
         {
-            _dataService.SaveToKK(".");
+            _dataService.SaveToKK("export");
         }
 
         private void GenerateXLS()
@@ -106,6 +125,14 @@ namespace KiriKiriTranslator.ViewModel
         private void DestroyLabelAlias()
         {
 
+        }
+
+        private void RefreshAllTabs()
+        {
+            SimpleIoc.Default.GetInstance<LineListViewModel>().RefreshView();
+            SimpleIoc.Default.GetInstance<ChoicesViewModel>().RefreshView();
+            SimpleIoc.Default.GetInstance<NameTagsViewModel>().RefreshView();
+            SimpleIoc.Default.GetInstance<ChapterNamesViewModel>().RefreshView();
         }
 
     }

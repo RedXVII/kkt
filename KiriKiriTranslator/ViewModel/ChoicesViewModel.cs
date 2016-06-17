@@ -31,13 +31,17 @@ namespace KiriKiriTranslator.ViewModel
             ViewList = new CollectionViewSource();
             ViewList.Source = choicesList;
 
+            RefreshView();
+        }
 
+        public void RefreshView()
+        {
+            choicesList.Clear();
             foreach (KKChoice choice in _dataService.KKChoices)
             {
                 choicesList.Add(choice);
             }
-
-
         }
+
     }
 }

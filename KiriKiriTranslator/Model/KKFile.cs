@@ -46,7 +46,8 @@ namespace KiriKiriTranslator.Model
 
         public KKFile()
         {
-            this.Load(@"D:\data.kkt"); //let's never do this again.
+            this.Init();
+            this.Load(@"data.kkt");
         }
 
         public bool LoadFromKK(string filePath)
@@ -93,9 +94,14 @@ namespace KiriKiriTranslator.Model
                 currentGroup.Compute();
                 outputFile.Labels.Add(currentGroup);
             }
+            
+            var newChoices = LoadChoicesFromLabels(outputFile.Labels);
 
             KKOutputFiles.Add(outputFile);
             KKLabelGroups.AddRange(outputFile.Labels);
+            KKChoices.AddRange(newChoices);
+            RefreshNameTags();
+
             _KKLabelGroupsToTranslateCache = null;
             RefreshChapterNames();
 
@@ -104,6 +110,10 @@ namespace KiriKiriTranslator.Model
         }
         public bool Load(string filePath)
         {
+            if (!File.Exists(filePath))
+            {
+                return false;
+            }
             string serializedJson = File.ReadAllText(filePath);
 
             var JsonFile = JsonConvert.DeserializeObject<KKJsonFile>(serializedJson);
@@ -128,6 +138,7 @@ namespace KiriKiriTranslator.Model
 
         public bool SaveToKK(string folderPath)
         {
+            RefreshAliasText();
             var nameTagDict = new Dictionary<string ,string>();
             foreach (var nameTag in KKNameTags)
             {
@@ -259,6 +270,20 @@ namespace KiriKiriTranslator.Model
             return true;
         }
 
+        private void Init()
+        {
+            KKOutputFiles = new List<KKOutputFile>();
+
+            KKLabelGroups = new List<KKLabelGroup>();
+            _KKLabelGroupsToTranslateCache = null;
+            this.RefreshAliasText();
+
+            KKNameTags = new List<KKNameTag>();
+
+            KKChoices = new List<KKChoice>();
+
+            KKChapterNames = new List<KKChapterName>();
+        }
 
         private void RefreshAliasText()
         {
@@ -290,17 +315,16 @@ namespace KiriKiriTranslator.Model
             }
         }
 
-
-        private List<KKNameTag> LoadNamesFromDictionary(Dictionary<string, string> dict)
+        private void RefreshNameTags()
         {
-            var res = new List<KKNameTag>();
-
+            var dict = LoadNamesFromLabels(this.KKLabelGroups);
             foreach (var pair in dict)
             {
-                res.Add(new KKNameTag { Original = pair.Key, Translated = pair.Value });
+                if (!this.KKNameTags.Exists( nt => nt.Original == pair.Key))
+                {
+                    this.KKNameTags.Add(new KKNameTag { Original = pair.Key, Translated = pair.Value });
+                }   
             }
-
-            return res;
         }
 
         private Dictionary<string, string> LoadNamesFromLabels(List<KKLabelGroup> labelGroups)

@@ -51,15 +51,19 @@ namespace KiriKiriTranslator.ViewModel
 
             ViewList = new CollectionViewSource();
             ViewList.Source = labelGroupList;
-
-            MaxPage = _dataService.KKLabelGroupsToTranslate.Count / _pageSize + 1;
-
             
             NextPageCommand = new RelayCommand(NextPage, CanNextPage);
             PreviousPageCommand = new RelayCommand(PreviousPage, CanPreviousPage);
             JumpToPageCommand = new RelayCommand(JumpToPage, CanJumpToPage);
             CopyToClipboardCommand = new RelayCommand<string>(CopyToClipboard);
 
+            RefreshView();
+        }
+
+        public void RefreshView()
+        {
+            MaxPage = _dataService.KKLabelGroupsToTranslate.Count / _pageSize + 1;
+            RaisePropertyChanged("MaxPage");
             SetPage(1);
         }
 

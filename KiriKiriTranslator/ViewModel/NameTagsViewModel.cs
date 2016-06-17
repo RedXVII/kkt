@@ -32,11 +32,17 @@ namespace KiriKiriTranslator.ViewModel
             ViewList.Source = nameTagList;
 
 
+            RefreshView();
+
+        }
+
+        public void RefreshView()
+        {
+            nameTagList.Clear();
             foreach (KKNameTag nameTag in _dataService.KKNameTags)
             {
                 nameTagList.Add(nameTag);
             }
-            
 
         }
     }
