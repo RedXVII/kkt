@@ -1,3 +1,5 @@
+This tool only works for Lilith games!
+
 Howto:
 
 1. Load your script files with "Add KS File"
